@@ -1,11 +1,9 @@
 package asymmetry;
 
 import com.sun.org.apache.xml.internal.security.utils.Base64;
-import com.sun.xml.internal.rngom.parse.host.Base;
 import sun.misc.BASE64Decoder;
 
 import javax.crypto.Cipher;
-import java.nio.charset.Charset;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -81,30 +79,28 @@ public class RSA {
                 "zMOy++GlLW8=";
 
         try {
+            byte[] publicKeyBytes = Base64.decode(publicKeyStr);
+
+            X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(publicKeyBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PublicKey publicKey = keyFactory.generatePublic(keySpecPublic);
+
+            byte[] privateKeyBytes = (new BASE64Decoder()).decodeBuffer(privateKeyStr);
+            PKCS8EncodedKeySpec keySpecPrivate = new PKCS8EncodedKeySpec(privateKeyBytes);
+            PrivateKey privateKey = keyFactory.generatePrivate(keySpecPrivate);
 
 
-        byte[] publicKeyBytes = Base64.decode(publicKeyStr);
+            //3: 使用私钥加密数据（公钥解密数据）
+            Cipher cipher1 = Cipher.getInstance("RSA");
+            cipher1.init(Cipher.ENCRYPT_MODE,privateKey);
+            byte[] result = cipher1.doFinal(messageData.getBytes());
+            System.out.println("原字符串：" + messageData + "加密后的结果:" + Base64.encode(result));
 
-        X509EncodedKeySpec keySpecPublic = new X509EncodedKeySpec(publicKeyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PublicKey publicKey = keyFactory.generatePublic(keySpecPublic);
-
-        byte[] privateKeyBytes = (new BASE64Decoder()).decodeBuffer(privateKeyStr);
-        PKCS8EncodedKeySpec keySpecPrivate = new PKCS8EncodedKeySpec(privateKeyBytes);
-        PrivateKey privateKey = keyFactory.generatePrivate(keySpecPrivate);
-
-
-        //3: 使用私钥加密数据（公钥解密数据）
-        Cipher cipher1 = Cipher.getInstance("RSA");
-        cipher1.init(Cipher.ENCRYPT_MODE,privateKey);
-        byte[] result = cipher1.doFinal(messageData.getBytes());
-        System.out.println("原字符串：" + messageData + "加密后的结果:" + Base64.encode(result));
-
-        //4: 使用公钥解密数据（公钥解密数据）
-        Cipher cipher2 = Cipher.getInstance("RSA");
-        cipher2.init(Cipher.DECRYPT_MODE,publicKey);
-        byte[] result2 = cipher2.doFinal(result);
-        System.out.println("原字符串：" + messageData + "加密后的结果:" + new String(result2));
+            //4: 使用公钥解密数据（公钥解密数据）
+            Cipher cipher2 = Cipher.getInstance("RSA");
+            cipher2.init(Cipher.DECRYPT_MODE,publicKey);
+            byte[] result2 = cipher2.doFinal(result);
+            System.out.println("原字符串：" + messageData + "加密后的结果:" + new String(result2));
 
         }catch (Exception e){
             e.printStackTrace();
