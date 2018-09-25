@@ -9,6 +9,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.stream.IntStream;
 
 /**
  * @author: Cola
@@ -20,7 +21,16 @@ public class RSA {
     public  static String messageData = "Hello world!";
     public static void main(String[] args) {
         //RSA();
-        RSATest();
+
+
+
+        Long start = System.currentTimeMillis();
+        IntStream.range(0,10000).forEach(item->{
+                RSATest();
+        });
+        Long startEnd = System.currentTimeMillis() - start;
+        System.out.println(startEnd);
+
     }
 
     /**
@@ -94,13 +104,13 @@ public class RSA {
             Cipher cipher1 = Cipher.getInstance("RSA");
             cipher1.init(Cipher.ENCRYPT_MODE,privateKey);
             byte[] result = cipher1.doFinal(messageData.getBytes());
-            System.out.println("原字符串：" + messageData + "加密后的结果:" + Base64.encode(result));
+            //System.out.println("原字符串：" + messageData + "加密后的结果:" + Base64.encode(result));
 
             //4: 使用公钥解密数据（公钥解密数据）
             Cipher cipher2 = Cipher.getInstance("RSA");
             cipher2.init(Cipher.DECRYPT_MODE,publicKey);
             byte[] result2 = cipher2.doFinal(result);
-            System.out.println("原字符串：" + messageData + "加密后的结果:" + new String(result2));
+            //System.out.println("原字符串：" + messageData + "加密后的结果:" + new String(result2));
 
         }catch (Exception e){
             e.printStackTrace();
