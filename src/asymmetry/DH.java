@@ -24,7 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
 /****
  *  -Djdk.crypto.KeyAgreement.legacyKDF=true 指定JDK运行参数
  */
-public abstract class DH {
+public class DH {
     /**
      * 非对称加密密钥算法
      */
